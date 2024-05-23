@@ -1,6 +1,5 @@
 package com.maids.cc.librarymanagementsystem.patron.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maids.cc.librarymanagementsystem.exception.LibraryManagementSystemException;
 import com.maids.cc.librarymanagementsystem.generalresponse.Response;
 import com.maids.cc.librarymanagementsystem.patron.dto.request.*;
@@ -10,7 +9,6 @@ import com.maids.cc.librarymanagementsystem.patron.model.Role;
 import com.maids.cc.librarymanagementsystem.patron.repository.PatronRepository;
 import com.maids.cc.librarymanagementsystem.security.JwtService;
 import jakarta.annotation.PostConstruct;
-import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
