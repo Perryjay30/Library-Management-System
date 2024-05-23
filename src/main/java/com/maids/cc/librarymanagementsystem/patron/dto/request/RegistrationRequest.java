@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 @Data
 public class RegistrationRequest {
     @NotBlank(message = "This field is required")
+    private String emailAddress;
+    @NotBlank(message = "This field is required")
     private String firstName;
     @NotBlank(message = "This field is required")
     private String lastName;

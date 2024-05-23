@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class Patron {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long patronId;
+    private Long id;
     private String firstName;
     private String lastName;
     @Pattern(regexp = "^\\d{1,11}$")
@@ -25,8 +25,6 @@ public class Patron {
     private Role role;
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$")
     private String password;
-    @Enumerated(EnumType.STRING)
-    private Status status;
     private String patronUUID;
     private String homeAddress;
     private String dateJoined;
