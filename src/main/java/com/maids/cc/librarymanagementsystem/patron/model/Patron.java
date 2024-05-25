@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Data
 @Entity
 @Builder
@@ -27,6 +30,6 @@ public class Patron {
     private String password;
     private String patronUUID;
     private String homeAddress;
-    private String dateJoined;
-    private String dateModified;
+    private LocalDateTime dateJoined;
+    private LocalDateTime dateModified;
 }

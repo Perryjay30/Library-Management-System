@@ -101,7 +101,7 @@ public class PatronServiceImpl implements PatronService {
                 ? editProfileRequest.getPhoneNumber() : existingPatron.getPhoneNumber());
         existingPatron.setLastName(editProfileRequest.getLastName() != null && !editProfileRequest.getLastName().equals(" ")
                 ? editProfileRequest.getLastName() : existingPatron.getLastName());
-        existingPatron.setDateModified(String.valueOf(LocalDateTime.now()));
+        existingPatron.setDateModified(LocalDateTime.now());
         patronRepository.save(existingPatron);
         return new Response("Profile Updated Successfully");
     }
@@ -134,7 +134,7 @@ public class PatronServiceImpl implements PatronService {
         newPatron.setLastName(registrationRequest.getLastName());
         newPatron.setPassword(registrationRequest.getPassword());
         newPatron.setPatronUUID(UUID.randomUUID().toString());
-        newPatron.setDateJoined(LocalDateTime.now().toString());
+        newPatron.setDateJoined(LocalDateTime.now());
         newPatron.setRole(USER);
         return newPatron;
     }

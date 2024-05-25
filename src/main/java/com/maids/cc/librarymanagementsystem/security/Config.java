@@ -41,7 +41,7 @@ public class Config {
                 .permitAll()
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("api/patrons/**")
+                .requestMatchers("api/patrons/**", "api/books/**")
                 .authenticated()
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
