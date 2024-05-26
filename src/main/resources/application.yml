@@ -1,0 +1,34 @@
+server:
+  port: 2205
+
+spring:
+  application:
+    name: Library-Management-System
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/librarymanagementsystem_db?createDatabaseIfNotExist=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${username}
+    password: ${password}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+
+  cache:
+    type: simple
+
+logging:
+  level:
+    org:
+      springframework:
+        cache: DEBUG
+
+    com:
+      maids:
+        cc:
+          librarymanagementsystem: DEBUG
+  file:
+    name: ./logfile.log
