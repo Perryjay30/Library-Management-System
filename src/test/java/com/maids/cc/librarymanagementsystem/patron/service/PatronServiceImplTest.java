@@ -12,12 +12,14 @@ import com.maids.cc.librarymanagementsystem.patron.dto.request.RegistrationReque
 import com.maids.cc.librarymanagementsystem.patron.dto.response.LoginResponse;
 import com.maids.cc.librarymanagementsystem.patron.model.Patron;
 import com.maids.cc.librarymanagementsystem.patron.repository.PatronRepository;
-import com.maids.cc.librarymanagementsystem.patron.service.PatronService;
 import com.maids.cc.librarymanagementsystem.security.JwtService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
+@EnableCaching
 class PatronServiceImplTest {
 
     @Autowired
@@ -39,6 +42,15 @@ class PatronServiceImplTest {
 
     @MockBean
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    @BeforeEach
+    void setUp() {
+        cacheManager.getCache("patrons").clear();
+        cacheManager.getCache("allPatrons").clear();
+    }
 
     @Test
     void testThatPatronCanRegister() {
@@ -122,6 +134,23 @@ class PatronServiceImplTest {
     }
 
     @Test
+    void testThatPatronCanBeRetrievedByEmailAddress() {
+        String emailAddress = "mrjesus@gmail.com";
+        Patron patron = new Patron();
+        patron.setEmailAddress(emailAddress);
+
+        when(patronRepository.findByEmailAddress(emailAddress)).thenReturn(Optional.of(patron));
+        Patron retrievePatron = patronService.getExistingPatron(emailAddress);
+        assertEquals(emailAddress, retrievePatron.getEmailAddress());
+
+        Patron retrievePatron2 = patronService.getExistingPatron(emailAddress);
+        assertEquals(emailAddress, retrievePatron2.getEmailAddress());
+
+        verify(patronRepository, times(1)).findByEmailAddress(emailAddress);
+
+    }
+
+    @Test
     void testEditPatronProfile() {
         String emailAddress = "melanin@perry.com";
         EditProfileRequest editProfileRequest = new EditProfileRequest();
@@ -157,15 +186,19 @@ class PatronServiceImplTest {
     @Test
     void testGetAllPatrons() {
         Patron patron1 = new Patron();
-        patron1.setEmailAddress("patron1@perry.com");
+        patron1.setEmailAddress("zinchenko@perry.com");
 
         Patron patron2 = new Patron();
-        patron2.setEmailAddress("patron2@perry.com");
+        patron2.setEmailAddress("kwanbala@perry.com");
 
         when(patronRepository.findAll()).thenReturn(List.of(patron1, patron2));
 
         List<Patron> patrons = patronService.getAllPatrons();
         assertEquals(2, patrons.size());
+
+        List<Patron> patrons2 = patronService.getAllPatrons();
+        assertEquals(2, patrons2.size());
+        verify(patronRepository, times(1)).findAll();
     }
 
     @Test

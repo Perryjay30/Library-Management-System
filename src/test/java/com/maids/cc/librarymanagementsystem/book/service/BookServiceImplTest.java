@@ -6,10 +6,13 @@ import com.maids.cc.librarymanagementsystem.book.model.Book;
 import com.maids.cc.librarymanagementsystem.book.repository.BookRepository;
 import com.maids.cc.librarymanagementsystem.exception.LibraryManagementSystemException;
 import com.maids.cc.librarymanagementsystem.generalresponse.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
+@EnableCaching
 class BookServiceImplTest {
 
     @Autowired
@@ -26,6 +30,15 @@ class BookServiceImplTest {
 
     @MockBean
     private BookRepository bookRepository;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    @BeforeEach
+    void setUp() {
+        cacheManager.getCache("books").clear();
+        cacheManager.getCache("book").clear();
+    }
 
     @Test
     void testThatBooksCanBeAddedToTheLibrary() {
@@ -50,6 +63,10 @@ class BookServiceImplTest {
 
         Book retrievedBook = bookService.retrieveBookById(bookId);
         assertEquals(bookId, retrievedBook.getId());
+
+        Book retrievedBook2 = bookService.retrieveBookById(bookId);
+        assertEquals(bookId, retrievedBook2.getId());
+        verify(bookRepository, times(1)).findById(bookId);
     }
 
     @Test
@@ -93,17 +110,21 @@ class BookServiceImplTest {
     @Test
     void testRetrieveAllBooks() {
         Book book1 = new Book();
-        book1.setTitle("Book 1");
+        book1.setTitle("All that Glitters");
 
         Book book2 = new Book();
-        book2.setTitle("Book 2");
+        book2.setTitle("Learn Coding");
 
         when(bookRepository.findAll()).thenReturn(List.of(book1, book2));
 
         List<Book> books = bookService.retrieveAllBooks();
         assertEquals(2, books.size());
-        assertEquals("Book 1", books.get(0).getTitle());
-        assertEquals("Book 2", books.get(1).getTitle());
+
+        List<Book> books2 = bookService.retrieveAllBooks();
+        assertEquals(2, books2.size());
+        verify(bookRepository, times(1)).findAll();
+        assertEquals("All that Glitters", books.get(0).getTitle());
+        assertEquals("Learn Coding", books.get(1).getTitle());
     }
 
     @Test

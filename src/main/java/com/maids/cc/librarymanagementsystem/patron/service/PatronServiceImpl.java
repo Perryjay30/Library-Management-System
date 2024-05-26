@@ -9,6 +9,7 @@ import com.maids.cc.librarymanagementsystem.patron.model.Role;
 import com.maids.cc.librarymanagementsystem.patron.repository.PatronRepository;
 import com.maids.cc.librarymanagementsystem.security.JwtService;
 import jakarta.annotation.PostConstruct;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -85,6 +86,7 @@ public class PatronServiceImpl implements PatronService {
 
 
     @Override
+    @Cacheable(value = "patron", key = "#emailAddress")
     public Patron getExistingPatron(String emailAddress) {
         return patronRepository.findByEmailAddress(emailAddress)
                 .orElseThrow(() -> new LibraryManagementSystemException("This user is not available!!"));
@@ -114,6 +116,7 @@ public class PatronServiceImpl implements PatronService {
     }
 
     @Override
+    @Cacheable("allPatrons")
     public List<Patron> getAllPatrons() {
         return patronRepository.findAll();
     }

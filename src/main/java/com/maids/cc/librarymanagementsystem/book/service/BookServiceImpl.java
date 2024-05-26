@@ -7,6 +7,7 @@ import com.maids.cc.librarymanagementsystem.book.model.Book;
 import com.maids.cc.librarymanagementsystem.book.repository.BookRepository;
 import com.maids.cc.librarymanagementsystem.exception.LibraryManagementSystemException;
 import com.maids.cc.librarymanagementsystem.generalresponse.Response;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Cacheable(value = "book", key = "#bookId")
     public Book retrieveBookById(Long bookId) {
         return bookRepository.findById(bookId).orElseThrow(
                 () -> new LibraryManagementSystemException("Book isn't available"));
@@ -53,6 +55,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Cacheable("books")
     public List<Book> retrieveAllBooks() {
         return bookRepository.findAll();
     }
