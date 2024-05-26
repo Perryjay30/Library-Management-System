@@ -1,43 +1,42 @@
 package com.maids.cc.librarymanagementsystem.logging;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 @Aspect
 @Component
 public class LoggingAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
+    private final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
-    @Before("execution(* com.maids.cc.librarymanagementsystem.*.*(..))")
-    public void logBeforeMethod() {
-        logger.info("A method is about to be called");
-    }
+    @Pointcut("execution(* com.maids.cc.librarymanagementsystem.book.service.BookService.*(..)))")
+    public void bookServicePointCut() {}
 
-    @After("execution(* com.maids.cc.librarymanagementsystem.*.*(..))")
-    public void logAfterMethod() {
-        logger.info("A method has just been called");
-    }
+    @Pointcut("execution(* com.maids.cc.librarymanagementsystem.patron.service.PatronService.*(..)))")
+    public void patronServicePointCut() {}
 
-    @AfterThrowing(pointcut = "execution(* com.maids.cc.librarymanagementsystem.*.*(..))", throwing = "exception")
-    public void logExceptions(Exception exception) {
-        logger.error("An exception has been thrown: ", exception);
-    }
+    @Pointcut("execution(* com.maids.cc.librarymanagementsystem.borrowingrecord.service.BorrowingRecordService.*(..)))")
+    public void borrowingRecordServicePointCut() {}
 
-    @Around("execution(* com.maids.cc.librarymanagementsystem.*.*(..))")
+    @Around("bookServicePointCut() || patronServicePointCut() || borrowingRecordServicePointCut()")
     public Object logPerformanceMetrics(ProceedingJoinPoint joinPoint) throws Throwable {
+        String methodName = joinPoint.getSignature().getName();
+        String className = joinPoint.getTarget().getClass().toString();
+        Object [] methodArguments = joinPoint.getArgs();
         long startTime = System.currentTimeMillis();
-        Object result = joinPoint.proceed();
         long endTime = System.currentTimeMillis();
-        logger.info(joinPoint.getSignature() + " executed in " + (endTime - startTime) + "ms");
-        return result;
+        logger.info("Method invoked : ClassName = " + className + ": MethodName = " + methodName + ": methodArguments = "
+                + Arrays.toString(methodArguments));
+        Object responseObject = joinPoint.proceed();
+        logger.info("Method invoked : ClassName = " + className + ": MethodName = " + methodName + ": methodResponse = "
+                + responseObject);
+        logger.info(joinPoint.getSignature().getName() + " executed in " + (endTime - startTime) + "ms");
+        return responseObject;
     }
 }
 
